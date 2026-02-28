@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 215 30% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 30% 12%;
+    --primary: 212 96% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 205 36% 95%;
+    --secondary-foreground: 215 30% 18%;
+    --muted: 210 28% 95%;
+    --muted-foreground: 215 14% 45%;
+    --accent: 180 58% 92%;
+    --accent-foreground: 190 65% 24%;
+    --destructive: 0 72% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 29% 89%;
+    --input: 214 30% 91%;
+    --ring: 212 96% 56%;
+    --radius: 1.2rem;
+  }
+
+  .dark {
+    --background: 222 45% 7%;
+    --foreground: 210 20% 95%;
+    --card: 224 35% 10%;
+    --card-foreground: 210 20% 95%;
+    --popover: 224 35% 10%;
+    --popover-foreground: 210 20% 95%;
+    --primary: 199 89% 58%;
+    --primary-foreground: 222 45% 7%;
+    --secondary: 222 26% 16%;
+    --secondary-foreground: 210 20% 95%;
+    --muted: 223 25% 14%;
+    --muted-foreground: 215 14% 68%;
+    --accent: 168 47% 14%;
+    --accent-foreground: 175 70% 85%;
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 18%;
+    --input: 220 20% 16%;
+    --ring: 199 89% 58%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at top left, rgba(56, 139, 253, 0.18), transparent 28%),
+      radial-gradient(circle at top right, rgba(23, 185, 147, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(245, 248, 251, 1));
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 26%),
+      radial-gradient(circle at top right, rgba(45, 212, 191, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(7, 12, 22, 1), rgba(6, 11, 21, 1));
+  }
+
+  a,
+  button,
+  input,
+  [role="button"],
+  [data-slot="command-item"] {
+    @apply outline-none;
+  }
+
+  *:focus-visible {
+    @apply ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply border border-white/50 bg-white/70 shadow-soft backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/55;
+  }
+
+  .glass-panel-subtle {
+    @apply border border-white/40 bg-white/55 backdrop-blur-xl dark:border-white/10 dark:bg-white/5;
+  }
+
+  .page-grid {
+    background-image:
+      linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.92), transparent);
+  }
+}

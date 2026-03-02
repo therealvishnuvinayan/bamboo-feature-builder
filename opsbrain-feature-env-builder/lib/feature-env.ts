@@ -29,13 +29,13 @@ export const TARGET_META: Record<
     label: "Admin Portal",
     shortLabel: "Admin",
     repoSlug: "bamboo-card/bamboo-admin-frontend",
-    description: "Internal operations dashboard and QA preview surface.",
+    description: "Deploy the internal Bamboo admin frontend.",
   },
   client: {
     label: "Client Portal",
     shortLabel: "Client",
     repoSlug: "bamboo-card/bamboo_card_front",
-    description: "Customer-facing portal and end-user preview surface.",
+    description: "Deploy the Bamboo client-facing frontend.",
   },
 };
 

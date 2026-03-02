@@ -3,27 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Gauge,
   HelpCircle,
   LayoutTemplate,
   PanelLeftClose,
   PanelLeftOpen,
   Settings2,
-  Workflow,
 } from "lucide-react";
 
 import { BambooLogoMark } from "@/components/shared/bamboo-logo";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { developerSettingsEnabled } from "@/lib/app-config";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { label: "Dashboard", href: "/", icon: Gauge },
-  { label: "Feature Env Builder", href: "/tech/feature-env", icon: LayoutTemplate },
-  { label: "Runs", href: "/runs", icon: Workflow },
-  { label: "Settings", href: "/settings", icon: Settings2 },
+  { label: "Feature Env Builder", href: "/", icon: LayoutTemplate },
   { label: "Help", href: "/help", icon: HelpCircle },
-];
+] as const;
 
 export function AppSidebar({
   collapsed,
@@ -37,6 +33,9 @@ export function AppSidebar({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const items = developerSettingsEnabled
+    ? [...navigation, { label: "Settings", href: "/settings", icon: Settings2 }]
+    : navigation;
 
   return (
     <div
@@ -49,7 +48,7 @@ export function AppSidebar({
         <Link
           href="/"
           onClick={onNavigate}
-          aria-label="Go to dashboard"
+          aria-label="Go to feature builder"
           className="flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <BambooLogoMark className="h-11 w-11 rounded-2xl" />
@@ -68,7 +67,7 @@ export function AppSidebar({
       </div>
 
       <div className="mt-8 space-y-2">
-        {navigation.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href;
 
@@ -100,21 +99,6 @@ export function AppSidebar({
             </Tooltip>
           );
         })}
-      </div>
-
-      <div className="mt-auto rounded-[1.6rem] border border-white/30 bg-gradient-to-br from-sky-500/12 via-white/50 to-teal-400/10 p-4 dark:border-white/10 dark:from-sky-500/10 dark:via-white/5 dark:to-teal-400/10">
-        {!collapsed || mobile ? (
-          <>
-            <p className="font-display text-sm font-semibold">Environment Delivery</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Validate the backend, deploy Admin and Client targets, and track every run from one workspace.
-            </p>
-          </>
-        ) : (
-          <div className="flex justify-center">
-            <BambooLogoMark className="h-11 w-11 rounded-2xl" />
-          </div>
-        )}
       </div>
     </div>
   );

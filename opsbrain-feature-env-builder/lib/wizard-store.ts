@@ -30,7 +30,7 @@ type WizardState = {
   reset: () => void;
 };
 
-function createTargetState(ticketDigits = "8107"): Record<RepoTarget, FrontendTargetState> {
+function createTargetState(ticketDigits = ""): Record<RepoTarget, FrontendTargetState> {
   return {
     admin: {
       enabled: true,
@@ -51,7 +51,7 @@ function createTargetState(ticketDigits = "8107"): Record<RepoTarget, FrontendTa
 
 export const useWizardStore = create<WizardState>((set) => ({
   activeStep: 1,
-  backendInput: "8107",
+  backendInput: "",
   validation: null,
   targets: createTargetState(),
   commandCounters: {
@@ -146,7 +146,7 @@ export const useWizardStore = create<WizardState>((set) => ({
   reset: () =>
     set({
       activeStep: 1,
-      backendInput: "8107",
+      backendInput: "",
       validation: null,
       targets: createTargetState(),
       commandCounters: {

@@ -1,5 +1,5 @@
-import { FeatureEnvBuilder } from "@/components/feature-env/feature-env-builder";
+import { redirect } from "next/navigation";
 
 export default function FeatureEnvPage() {
-  return <FeatureEnvBuilder />;
+  redirect("/");
 }

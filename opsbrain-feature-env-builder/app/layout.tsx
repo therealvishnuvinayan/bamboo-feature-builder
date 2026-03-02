@@ -18,7 +18,7 @@ const displayFont = Sora({
 
 export const metadata: Metadata = {
   title: "Bamboo Feature Builder",
-  description: "Dashboard for validating backend feature environments and deploying frontend workflows.",
+  description: "Workspace for validating backend feature environments and deploying frontend workflows.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

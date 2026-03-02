@@ -13,6 +13,7 @@ import {
 import { useDeferredValue, useEffect, useRef, useState } from "react";
 
 import { CreateBranchModal } from "@/components/feature-env/create-branch-modal";
+import { CopyButton } from "@/components/shared/copy-button";
 import { EmptyStateIllustration } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -152,15 +153,26 @@ export function FrontendTargetPanel({
               </p>
               {!parsedTicketDigits ? (
                 <p className="text-xs text-destructive">
-                  Enter plain digits like 8107 so branch discovery can run.
+                  Enter BAM ticket digits so branch discovery can run.
                 </p>
               ) : null}
             </div>
             <div className="rounded-[1.35rem] border border-border/70 bg-secondary/35 p-4">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                URL Preview
-              </p>
-              <p className="mt-2 break-all text-sm font-medium">{previewUrl}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    URL Preview
+                  </p>
+                  <p className="mt-2 break-all text-sm font-medium">{previewUrl}</p>
+                </div>
+                {parsedTicketDigits ? (
+                  <CopyButton
+                    value={previewUrl}
+                    label={`${TARGET_META[target].shortLabel.toLowerCase()} preview url`}
+                    variant="ghost"
+                  />
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -297,8 +309,14 @@ export function FrontendTargetPanel({
             <SummaryLine
               label="Selected Branch"
               value={selectedBranch?.name ?? `deploy-${branchToken}`}
+              copyValue={selectedBranch?.name ?? (parsedTicketDigits ? `deploy-${branchToken}` : undefined)}
             />
-            <SummaryLine label="Deploy URL Preview" value={previewUrl} link={parsedTicketDigits ? previewUrl : undefined} />
+            <SummaryLine
+              label="Deploy URL Preview"
+              value={previewUrl}
+              link={parsedTicketDigits ? previewUrl : undefined}
+              copyValue={parsedTicketDigits ? previewUrl : undefined}
+            />
           </div>
         </CardContent>
       </Card>
@@ -327,10 +345,12 @@ function SummaryLine({
   label,
   value,
   link,
+  copyValue,
 }: {
   label: string;
   value: string;
   link?: string;
+  copyValue?: string;
 }) {
   return (
     <div className="rounded-[1.35rem] border border-border/70 bg-secondary/35 p-4">
@@ -339,13 +359,16 @@ function SummaryLine({
       </p>
       <div className="mt-2 flex items-start justify-between gap-3">
         <p className="min-w-0 flex-1 break-all text-sm font-medium">{value}</p>
-        {link ? (
-          <Button asChild size="icon" variant="ghost" className="h-8 w-8 shrink-0">
-            <a href={link} target="_blank" rel="noreferrer" aria-label={`Open ${label}`}>
-              <ArrowUpRight className="size-4" />
-            </a>
-          </Button>
-        ) : null}
+        <div className="flex shrink-0 items-center gap-1">
+          {copyValue ? <CopyButton value={copyValue} label={label.toLowerCase()} variant="ghost" /> : null}
+          {link ? (
+            <Button asChild size="icon" variant="ghost" className="h-8 w-8">
+              <a href={link} target="_blank" rel="noreferrer" aria-label={`Open ${label}`}>
+                <ArrowUpRight className="size-4" />
+              </a>
+            </Button>
+          ) : null}
+        </div>
       </div>
     </div>
   );

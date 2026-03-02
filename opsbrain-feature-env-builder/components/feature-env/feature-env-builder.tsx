@@ -12,7 +12,6 @@ import {
   ArrowUpRight,
   CheckCircle2,
   Copy,
-  Layers3,
   Loader2,
   Rocket,
   Sparkles,
@@ -114,7 +113,6 @@ export function FeatureEnvBuilder() {
       Boolean(targets[target].selectedBranch)
     );
   });
-  const activeRuns = selectedTargets.filter((target) => targets[target].currentRun);
   const successfulTargets = selectedTargets.filter(
     (target) => targets[target].currentRun?.status === "success",
   );
@@ -369,7 +367,7 @@ export function FeatureEnvBuilder() {
 
     commandRef.current = commandCount;
     if (validation && readyTargets.length === selectedTargets.length && selectedTargets.length) {
-      void deployMutation.mutateAsync(selectedTargets);
+      deployMutation.mutate(selectedTargets);
     } else {
       startTransition(() => setActiveStep(3));
     }
@@ -396,47 +394,16 @@ export function FeatureEnvBuilder() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-8">
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-white/75 via-white/55 to-sky-500/10 dark:from-slate-950/70 dark:via-slate-950/50 dark:to-sky-500/10">
-          <CardContent className="flex flex-col gap-6 p-8">
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="secondary">Bamboo Feature Builder</Badge>
-              <Badge variant="outline">Admin + Client</Badge>
-            </div>
-            <div>
-              <h1 className="font-display text-4xl font-semibold tracking-tight lg:text-5xl">
-                Validate the backend once, then deploy Admin, Client, or both with separate BAM tickets.
-              </h1>
-              <p className="mt-4 max-w-2xl text-base text-muted-foreground">
-                The builder now orchestrates two frontend repositories with independent branch discovery, workflow polling, and final preview URLs.
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-4">
-              <HeroMetric label="Backend source" value={validation?.branchToken ?? "Awaiting validation"} />
-              <HeroMetric label="Targets selected" value={`${selectedTargets.length}`} />
-              <HeroMetric label="Active runs" value={`${activeRuns.length}`} />
-              <HeroMetric label="Completed targets" value={`${successfulTargets.length}`} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/70">
-          <CardHeader>
-            <Badge variant="outline" className="w-fit">
-              Keyboard Shortcuts
-            </Badge>
-            <CardTitle className="text-xl">Command palette</CardTitle>
-            <CardDescription>
-              Use Ctrl/⌘ + K to validate backend input, refresh branch discovery, or dispatch both frontend workflows from one place.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
-            <Shortcut label="Validate Backend" value="Ctrl/⌘ K" />
-            <Shortcut label="Find Branches" value="Step 2 action" />
-            <Shortcut label="Deploy Targets" value="Step 3 action" />
-            <Shortcut label="Toggle Theme" value="Quick action" />
-          </CardContent>
-        </Card>
+      <div className="space-y-2">
+        <Badge variant="secondary" className="w-fit">
+          Bamboo Feature Builder
+        </Badge>
+        <h1 className="font-display text-4xl font-semibold tracking-tight">
+          Create a feature environment
+        </h1>
+        <p className="max-w-3xl text-sm text-muted-foreground">
+          Validate the backend, choose the frontend target, and deploy the environment links QA needs.
+        </p>
       </div>
 
       <WizardStepper activeStep={activeStep} />
@@ -481,8 +448,8 @@ export function FeatureEnvBuilder() {
               failedTargets={failedTargets}
               pendingLookups={pendingLookups}
               latestRunErrors={latestRunErrors}
-              onDeploySelected={() => void deployMutation.mutateAsync(selectedTargets)}
-              onRetryTarget={(target) => void deployMutation.mutateAsync([target])}
+              onDeploySelected={() => deployMutation.mutate(selectedTargets)}
+              onRetryTarget={(target) => deployMutation.mutate([target])}
               onReset={() => {
                 setPendingLookups(EMPTY_PENDING_LOOKUPS);
                 setDispatchErrors({});
@@ -525,6 +492,34 @@ function DeployStep({
 }) {
   const validation = useWizardStore((state) => state.validation);
   const targets = useWizardStore((state) => state.targets);
+  const timelineSectionRef = useRef<HTMLDivElement>(null);
+  const didAutoScrollRef = useRef(false);
+  const hasDeploymentActivity = selectedTargets.some((target) => {
+    return (
+      dispatchingTargets.includes(target) ||
+      Boolean(pendingLookups[target]) ||
+      Boolean(targets[target].currentRun)
+    );
+  });
+
+  useEffect(() => {
+    if (!hasDeploymentActivity) {
+      didAutoScrollRef.current = false;
+      return;
+    }
+
+    if (didAutoScrollRef.current) {
+      return;
+    }
+
+    didAutoScrollRef.current = true;
+    requestAnimationFrame(() => {
+      timelineSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [hasDeploymentActivity]);
 
   if (!validation || !selectedTargets.length) {
     return (
@@ -573,18 +568,12 @@ function DeployStep({
               </Badge>
             ))}
           </div>
-          <CardTitle className="text-2xl">Deploy and monitor selected frontend targets</CardTitle>
+          <CardTitle className="text-2xl">Deploy selected frontend targets</CardTitle>
           <CardDescription>
-            Each selected repo dispatches the same deploy workflow independently, then polls workflow and job status in parallel.
+            Start the deployment and watch the live timeline for each selected target below.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="grid gap-4 md:grid-cols-4">
-            <DeploySummary label="Backend Ticket" value={validation.branchToken} />
-            <DeploySummary label="Selected Targets" value={`${selectedTargets.length}`} />
-            <DeploySummary label="Successful" value={`${successfulTargets.length}`} />
-            <DeploySummary label="Failed" value={`${failedTargets.length}`} />
-          </div>
           <div className="flex flex-wrap gap-3">
             <Button
               size="lg"
@@ -629,7 +618,10 @@ function DeployStep({
         />
       ) : null}
 
-      <div className={`grid gap-6 ${selectedTargets.length > 1 ? "2xl:grid-cols-2" : ""}`}>
+      <div
+        ref={timelineSectionRef}
+        className={`grid gap-6 ${selectedTargets.length > 1 ? "2xl:grid-cols-2" : ""}`}
+      >
         {selectedTargets.map((target) => {
           const targetState = targets[target];
           const parsedTicketDigits =
@@ -701,7 +693,7 @@ function TargetDeploymentPanel({
         <CardContent className="grid gap-4 md:grid-cols-3">
           <DeploySummary label="Target" value={TARGET_META[target].shortLabel} />
           <DeploySummary label="Branch" value={branchName} />
-          <DeploySummary label="Preview URL" value={frontendUrl} />
+          <SuccessLink label="Preview URL" value={frontendUrl} />
         </CardContent>
       </Card>
 
@@ -832,7 +824,7 @@ function SuccessSummaryCard({
             </div>
             <div>
               <p className="font-display text-2xl font-semibold">
-                {partial ? "Partial deploy complete" : "Feature environments are live"}
+                {partial ? "Partial deploy complete" : "Environment ready"}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {partial
@@ -892,28 +884,6 @@ function SuccessSummaryCard({
         </CardContent>
       </Card>
     </motion.div>
-  );
-}
-
-function HeroMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[1.45rem] border border-white/50 bg-white/75 p-4 shadow-soft dark:border-white/10 dark:bg-white/5">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-2 text-sm font-medium">{value}</p>
-    </div>
-  );
-}
-
-function Shortcut({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between rounded-[1.4rem] border border-border/70 bg-background/70 px-4 py-3">
-      <span>{label}</span>
-      <span className="rounded-full border border-border px-3 py-1 text-xs tracking-widest text-muted-foreground">
-        {value}
-      </span>
-    </div>
   );
 }
 

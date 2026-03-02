@@ -60,10 +60,10 @@ export function FrontendTargetsStep() {
           </div>
           <CardTitle className="text-2xl">Choose frontend targets and branches</CardTitle>
           <CardDescription>
-            Pick Admin, Client, or both. Each target can reuse the backend ticket or point to a different BAM ticket before deployment.
+            Pick Admin, Client, or both. For each selected target, confirm the BAM ticket and choose the branch to deploy.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             {REPO_TARGETS.map((target) => {
               const isEnabled = targets[target].enabled;
@@ -116,15 +116,6 @@ export function FrontendTargetsStep() {
               );
             })}
           </div>
-
-          <div className="rounded-[1.6rem] border border-border/70 bg-secondary/35 p-5">
-            <p className="text-sm font-medium">Selection guidance</p>
-            <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <p>Use both targets when QA needs the full admin and client experience for the same backend ticket.</p>
-              <p>Keep Admin only when the work is internal tooling, or Client only when the customer portal changed independently.</p>
-              <p>Each selected target must end on a branch containing its own BAM-#### token before deploy.</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -160,7 +151,7 @@ export function FrontendTargetsStep() {
             disabled={!allReady}
             onClick={() => startTransition(() => setActiveStep(3))}
           >
-            Prepare Deploy View
+            Continue to Deploy
             {allReady ? <ArrowRight className="size-4" /> : <Rocket className="size-4" />}
           </Button>
         </CardContent>

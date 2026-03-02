@@ -200,7 +200,7 @@ export function LocalAccessGate({ children }: { children: React.ReactNode }) {
                   ) : (
                     <LockKeyhole className="size-4" />
                   )}
-                  Enter Dashboard
+                  Open Feature Builder
                 </Button>
               </form>
             </CardContent>

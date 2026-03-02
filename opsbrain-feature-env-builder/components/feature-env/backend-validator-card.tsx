@@ -27,7 +27,7 @@ const backendSchema = z.object({
     .trim()
     .min(1, "Enter a BAM ticket number or Swagger URL.")
     .refine((value) => parseBackendInput(value) !== null, {
-      message: "Use a BAM ticket like 8107 or a bamboo Swagger URL.",
+      message: "Use BAM ticket digits or a Bamboo Swagger URL.",
     }),
 });
 
@@ -75,13 +75,13 @@ export function BackendValidatorCard() {
     }
 
     commandRef.current = commandCount;
-    void form.handleSubmit(async (values) => {
-      await mutation.mutateAsync(values.backendInput);
+    void form.handleSubmit((values) => {
+      mutation.mutate(values.backendInput);
     })();
   }, [commandCount, form, mutation]);
 
-  async function onSubmit(values: BackendFormValues) {
-    await mutation.mutateAsync(values.backendInput);
+  function onSubmit(values: BackendFormValues) {
+    mutation.mutate(values.backendInput);
   }
 
   return (
@@ -104,14 +104,14 @@ export function BackendValidatorCard() {
               <Input
                 id="backend-input"
                 aria-label="Swagger URL or Ticket Number"
-                placeholder="8107 or https://bamboo-api-bam-8107.dev2.bamboocardportal.com/swagger/index.html"
+                placeholder="Ticket number or Swagger URL"
                 {...form.register("backendInput")}
               />
               {form.formState.errors.backendInput ? (
                 <p className="text-sm text-destructive">{form.formState.errors.backendInput.message}</p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Example: <span className="font-medium text-foreground">8107</span> or the full swagger URL.
+                  Enter BAM ticket digits or the full Swagger URL for the backend.
                 </p>
               )}
             </div>
@@ -131,32 +131,6 @@ export function BackendValidatorCard() {
           </form>
 
           <Separator />
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-border/70 bg-background/70 p-5">
-              <p className="text-sm font-medium">Validation states</p>
-              <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-300 dark:bg-slate-600" />
-                  Idle and waiting for input
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-sky-500 animate-pulse-glow" />
-                  Server-side health-check + swagger fallback
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  Ready to discover frontend branches
-                </div>
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border border-border/70 bg-gradient-to-br from-sky-500/10 via-background to-teal-400/10 p-5">
-              <p className="text-sm font-medium">Expected deploy target</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Once validated, the wizard builds a frontend preview URL and unlocks deploy orchestration.
-              </p>
-            </div>
-          </div>
 
           {mutation.isPending ? (
             <div className="rounded-[1.5rem] border border-border/70 bg-background/75 p-5">
@@ -254,7 +228,7 @@ export function BackendValidatorCard() {
               </div>
               <p className="mt-4 font-display text-lg font-semibold">Waiting for a valid source</p>
               <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                Enter a BAM ticket or a bamboo swagger URL to preview the generated backend and frontend environment links.
+                Enter a BAM ticket or Swagger URL to preview the generated backend links.
               </p>
             </div>
           )}
